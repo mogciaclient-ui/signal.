@@ -18,6 +18,6 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 export const instagramService = {
   oauthUrl: () => request<{ url: string }>("/oauth/start"),
   sync: () => request<{ itemCount: number }>("/sync", { method: "POST" }),
-  publish: (imageUrl: string, caption: string) => request<{ status: string; platformPostId: string }>("/publish", { method: "POST", body: JSON.stringify({ imageUrl, caption }) }),
-  schedule: (imageUrl: string, caption: string, scheduledAt: string) => request<{ id: string; status: string }>("/scheduled", { method: "POST", body: JSON.stringify({ imageUrl, caption, scheduledAt }) }),
+  publish: (storagePath: string, caption: string) => request<{ status: string; platformPostId: string }>("/publish", { method: "POST", body: JSON.stringify({ storagePath, caption }) }),
+  schedule: (storagePath: string, caption: string, scheduledAt: string) => request<{ id: string; status: string }>("/scheduled", { method: "POST", body: JSON.stringify({ storagePath, caption, scheduledAt }) }),
 };
