@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { AuthGuard } from "./auth-guard";
 const posts = [
   { color: "peach", date: "8月25日", title: "夏季限定メニューのお知らせ", reach: "1,842", likes: "128" },
   { color: "mint", date: "8月21日", title: "朝の一杯を、もっと心地よく。", reach: "1,506", likes: "96" },
   { color: "blue", date: "8月18日", title: "店内の新しい席をご紹介", reach: "1,284", likes: "84" },
 ];
 export default function Home() {
-  return <main className="shell">
+  return <AuthGuard><main className="shell">
     <aside className="sidebar">
       <Link href="/" className="brand">Signal<span>.</span></Link>
       <nav aria-label="メインナビゲーション">
@@ -27,5 +28,5 @@ export default function Home() {
       <div className="section-heading"><div><h2>最近の投稿</h2><p>パフォーマンスをひと目で確認</p></div><Link href="/posts">すべて見る <span>→</span></Link></div>
       <div className="recent-posts">{posts.map((post) => <article className="post-card" key={post.title}><div className={`post-image ${post.color}`}><span>Signal.</span></div><div className="post-body"><small>{post.date}</small><strong>{post.title}</strong><div><span>リーチ <b>{post.reach}</b></span><span>いいね <b>{post.likes}</b></span></div></div></article>)}</div>
     </section>
-  </main>;
+  </main></AuthGuard>;
 }

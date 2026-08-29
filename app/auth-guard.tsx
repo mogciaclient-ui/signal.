@@ -1,0 +1,3 @@
+'use client';
+import {useEffect,useState} from 'react';import {useRouter} from 'next/navigation';import {onAuthStateChanged} from 'firebase/auth';import {firebaseServices,isFirebaseConfigured} from '../lib/firebase/client';
+export function AuthGuard({children}:{children:React.ReactNode}){const router=useRouter();const [ready,setReady]=useState(!isFirebaseConfigured);useEffect(()=>{if(!isFirebaseConfigured)return;return onAuthStateChanged(firebaseServices().auth,user=>{if(!user)router.replace('/login');else setReady(true)})},[router]);if(!ready)return <main className="auth-loading"><div className="brand">Signal<span>.</span></div><p>ログイン状態を確認しています…</p></main>;return children}
