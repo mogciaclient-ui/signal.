@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+cloud-run/node_modules/
+cloud-run/dist/
 /.pnp
 .pnp.*
 .yarn/*
