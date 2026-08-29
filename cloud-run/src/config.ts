@@ -5,11 +5,30 @@ const required = (name: string) => {
 };
 
 export const config = {
-  get projectId() { return required("FIREBASE_PROJECT_ID"); },
-  get appId() { return required("INSTAGRAM_APP_ID"); },
-  get appSecret() { return required("INSTAGRAM_APP_SECRET"); },
-  get redirectUri() { return required("INSTAGRAM_REDIRECT_URI"); },
-  get appUrl() { return required("APP_URL"); },
+  get projectId() {
+    return required("FIREBASE_PROJECT_ID");
+  },
+  get appId() {
+    return required("INSTAGRAM_APP_ID");
+  },
+  get appSecret() {
+    return required("INSTAGRAM_APP_SECRET");
+  },
+  get redirectUri() {
+    return required("INSTAGRAM_REDIRECT_URI");
+  },
+  get appUrl() {
+    return required("APP_URL");
+  },
+  get cloudRunUrl() {
+    return required("CLOUD_RUN_URL");
+  },
+  get schedulerServiceAccountEmail() {
+    return required("SCHEDULER_SERVICE_ACCOUNT_EMAIL");
+  },
+  get instagramTokenSecret() {
+    return required("INSTAGRAM_TOKEN_SECRET");
+  },
   apiVersion: process.env.INSTAGRAM_API_VERSION || "v24.0",
   port: Number(process.env.PORT || 8080),
 };

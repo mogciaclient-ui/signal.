@@ -1,6 +1,21 @@
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 import { config } from "./config.js";
 const secrets = new SecretManagerServiceClient();
-const secretId = (accountId: string) => `instagram-token-${accountId.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
-export async function saveToken(accountId: string, token: string) { const parent = `projects/${config.projectId}`; const id = secretId(accountId); try { await secrets.createSecret({ parent, secretId: id, secret: { replication: { automatic: {} } } }); } catch (error) { if (!(error instanceof Error) || !error.message.includes("ALREADY_EXISTS")) throw error; } await secrets.addSecretVersion({ parent: `${parent}/secrets/${id}`, payload: { data: Buffer.from(token) } }); return `${parent}/secrets/${id}`; }
-export async function readToken(reference: string) { const [version] = await secrets.accessSecretVersion({ name: `${reference}/versions/latest` }); const token = version.payload?.data?.toString(); if (!token) throw new Error("Instagram token is unavailable"); return token; }
+export async function saveToken(_accountId: string, token: string) {
+  void _accountId;
+  await secrets.addSecretVersion({
+    parent: config.instagramTokenSecret,
+    payload: { data: Buffer.from(token) },
+  });
+  return config.instagramTokenSecret;
+}
+export async function readToken(reference: string) {
+  if (reference !== config.instagramTokenSecret)
+    throw new Error("Unexpected token reference");
+  const [version] = await secrets.accessSecretVersion({
+    name: `${reference}/versions/latest`,
+  });
+  const token = version.payload?.data?.toString();
+  if (!token) throw new Error("Instagram token is unavailable");
+  return token;
+}
