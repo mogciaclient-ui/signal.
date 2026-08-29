@@ -1,0 +1,1 @@
+import {Legal} from '../public-pages';export default function Page(){return <Legal title="User Data Deletion"><p>Signal.に保存されたInstagram連携データの削除を希望する場合は、設定画面からInstagramとの接続を解除してください。</p><h2>削除されるデータ</h2><p>接続情報、同期した投稿・インサイト情報、予約投稿および関連ログを対象に削除手続きを行います。</p><h2>削除リクエスト</h2><p>接続解除ができない場合は、登録メールアドレスからサービス運営者へ削除をご依頼ください。</p></Legal>}

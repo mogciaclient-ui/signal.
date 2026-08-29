@@ -1,0 +1,1 @@
+import {Legal} from '../public-pages';export default function Page(){return <Legal title="Terms of Service"><p>本規約は、Signal.の利用条件を定めるものです。利用者は本規約およびInstagramプラットフォームの規約を遵守してサービスを利用します。</p><h2>禁止事項</h2><p>不正アクセス、第三者の権利侵害、サービス運営を妨げる行為を禁止します。</p><h2>免責</h2><p>外部サービスの仕様変更や障害により、一時的に機能を利用できない場合があります。</p></Legal>}

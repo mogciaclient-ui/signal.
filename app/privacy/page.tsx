@@ -1,0 +1,1 @@
+import {Legal} from '../public-pages';export default function Page(){return <Legal title="Privacy Policy"><p>Signal.は、Instagram連携機能の提供に必要なアカウント情報、投稿情報およびインサイト情報を取り扱います。</p><h2>利用目的</h2><p>取得した情報は、投稿の表示・公開・分析および本サービスの運営にのみ利用します。アクセストークンは安全な保管領域で管理し、第三者へ販売しません。</p><h2>お問い合わせ</h2><p>個人情報の取り扱いに関するお問い合わせは、サービス運営者までご連絡ください。</p></Legal>}
