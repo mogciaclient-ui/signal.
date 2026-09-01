@@ -1,0 +1,53 @@
+:root {
+  --violet: #ff8a15;
+  --accent: #ff8a15;
+  --accent-dark: #d96800;
+  --accent-soft: #fff2e5;
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.nav-item:hover,
+.nav-item.active {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
+.lavender {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.section-heading > a,
+.back,
+.detail-copy > a,
+.login-brand > div p,
+.text-button,
+.review-guide li b {
+  color: var(--accent-dark);
+}
+
+.chart i {
+  background: linear-gradient(#ff8a15, #ffd0a3);
+}
+
+.date-tile,
+.review-card > div span {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
+.instagram-button {
+  background: linear-gradient(100deg, #ff6b15, #ff8a15, #ffb15c);
+}
+
+.login-brand::after {
+  border-color: #ff8a1555;
+  box-shadow: 0 0 0 70px #ff8a150b, 0 0 0 140px #ff8a150b;
+}
+
+.progress-ring {
+  border-top-color: var(--accent);
+}
