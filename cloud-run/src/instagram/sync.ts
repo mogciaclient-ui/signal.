@@ -66,38 +66,31 @@ export async function syncInstagram(
       accountMetrics,
       token,
     );
-    await db
-      .collection("socialAccounts")
-      .doc(accountId)
-      .update({
-        lastSyncedAt: FieldValue.serverTimestamp(),
-        connectionStatus: "connected",
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-    await db
-      .collection("syncLogs")
-      .add({
-        platform: "instagram",
-        type: "posts",
-        status: "success",
-        startedAt,
-        finishedAt: Date.now(),
-        itemCount,
-        errorCode: null,
-      });
+    await db.collection("socialAccounts").doc(accountId).update({
+      lastSyncedAt: FieldValue.serverTimestamp(),
+      connectionStatus: "connected",
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+    await db.collection("syncLogs").add({
+      platform: "instagram",
+      type: "posts",
+      status: "success",
+      startedAt,
+      finishedAt: Date.now(),
+      itemCount,
+      errorCode: null,
+    });
     return { itemCount };
   } catch (error) {
-    await db
-      .collection("syncLogs")
-      .add({
-        platform: "instagram",
-        type: "posts",
-        status: "failed",
-        startedAt,
-        finishedAt: Date.now(),
-        itemCount,
-        errorCode: error instanceof Error ? error.name : "UNKNOWN",
-      });
+    await db.collection("syncLogs").add({
+      platform: "instagram",
+      type: "posts",
+      status: "failed",
+      startedAt,
+      finishedAt: Date.now(),
+      itemCount,
+      errorCode: error instanceof Error ? error.name : "UNKNOWN",
+    });
     throw error;
   }
 }

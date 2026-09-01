@@ -5,6 +5,12 @@ export type InstagramAccount = {
   account_type?: "BUSINESS" | "CREATOR";
   media_count?: number;
 };
+export type FacebookPage = {
+  id: string;
+  name: string;
+  access_token: string;
+  instagram_business_account?: { id: string };
+};
 export type InstagramMedia = {
   id: string;
   media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";

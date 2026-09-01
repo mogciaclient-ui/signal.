@@ -64,7 +64,7 @@ export default function InstagramSettings() {
         ) : (
           <>
             <p>InstagramとSignal.を接続すると、投稿管理・分析・予約投稿が利用できます。</p>
-            <button className="instagram-button" onClick={connect} disabled={busy}>◎ {busy ? "接続を準備中…" : "Instagramを接続"}</button>
+            <button className="instagram-button" onClick={connect} disabled={busy}>◎ {busy ? "接続を準備中…" : "FacebookでInstagramを接続"}</button>
             <small className="permission-note">基本情報・インサイト取得・画像投稿の権限のみを利用します。</small>
           </>
         )}

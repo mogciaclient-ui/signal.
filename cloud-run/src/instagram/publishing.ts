@@ -9,7 +9,10 @@ export async function publishImage(
   const container = await instagramFetch<{ id: string }>(
     `${platformAccountId}/media`,
     token,
-    { method: "POST", body: JSON.stringify({ image_url: imageUrl, caption }) },
+    {
+      method: "POST",
+      body: new URLSearchParams({ image_url: imageUrl, caption }),
+    },
   );
   for (let attempt = 0; attempt < 12; attempt++) {
     const status = await instagramFetch<{ status_code: string }>(
@@ -32,6 +35,9 @@ export async function publishImage(
   return instagramFetch<{ id: string }>(
     `${platformAccountId}/media_publish`,
     token,
-    { method: "POST", body: JSON.stringify({ creation_id: container.id }) },
+    {
+      method: "POST",
+      body: new URLSearchParams({ creation_id: container.id }),
+    },
   );
 }

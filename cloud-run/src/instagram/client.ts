@@ -19,12 +19,18 @@ export async function instagramFetch<T>(
   const url = path.startsWith("http")
     ? new URL(path)
     : new URL(
-        `https://graph.instagram.com/${config.apiVersion}/${path.replace(/^\//, "")}`,
+        `https://graph.facebook.com/${config.apiVersion}/${path.replace(/^\//, "")}`,
       );
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bearer ${token}`);
-  if (init.body && !headers.has("Content-Type"))
-    headers.set("Content-Type", "application/json");
+  if (init.body && !headers.has("Content-Type")) {
+    headers.set(
+      "Content-Type",
+      init.body instanceof URLSearchParams
+        ? "application/x-www-form-urlencoded"
+        : "application/json",
+    );
+  }
   const response = await fetch(url, { ...init, headers });
   const payload = (await response.json()) as {
     error?: {

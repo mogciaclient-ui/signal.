@@ -72,8 +72,10 @@ app.get("/oauth/callback", async (req, res, next) => {
       return res.status(400).send("Invalid OAuth callback");
     const userId = await consumeOAuthState(req.query.state);
     const token = await exchangeCode(req.query.code);
-    const account = await fetchAccount(token.accessToken);
-    const tokenReference = await saveToken(account.id, token.accessToken);
+    const { account, pageId, pageAccessToken } = await fetchAccount(
+      token.accessToken,
+    );
+    const tokenReference = await saveToken(account.id, pageAccessToken);
     await db
       .collection("socialAccounts")
       .doc(account.id)
@@ -82,6 +84,7 @@ app.get("/oauth/callback", async (req, res, next) => {
           userId,
           platform: "instagram",
           platformAccountId: account.id,
+          facebookPageId: pageId,
           username: account.username,
           accountType: account.account_type || "BUSINESS",
           connectionStatus: "connected",
