@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import Link from "next/link";
 import { AuthGuard } from "./auth-guard";
 const posts = [
@@ -8,14 +9,14 @@ const posts = [
 export default function Home() {
   return <AuthGuard><main className="shell">
     <aside className="sidebar">
-      <Link href="/" className="brand">Signal<span>.</span></Link>
+      <a href="/" className="brand">Signal<span>.</span></a>
       <nav aria-label="メインナビゲーション">
-        <Link href="/" className="nav-item active"><span>⌂</span>ホーム</Link>
-        <Link href="/posts" className="nav-item"><span>▦</span>投稿</Link>
-        <Link href="/analytics" className="nav-item"><span>⌁</span>分析</Link>
-        <Link href="/scheduled" className="nav-item"><span>◷</span>予約投稿</Link>
+        <a href="/" className="nav-item active"><span>⌂</span>ホーム</a>
+        <a href="/posts" className="nav-item"><span>▦</span>投稿</a>
+        <a href="/analytics" className="nav-item"><span>⌁</span>分析</a>
+        <a href="/scheduled" className="nav-item"><span>◷</span>予約投稿</a>
       </nav>
-      <nav className="bottom-nav"><Link href="/settings/instagram" className="nav-item"><span>⚙</span>設定</Link><div className="profile"><div className="avatar">S</div><div><strong>Signal Coffee</strong><small>@signal_coffee</small></div><span>⌄</span></div></nav>
+      <nav className="bottom-nav"><a href="/settings/instagram" className="nav-item"><span>⚙</span>設定</a><div className="profile"><div className="avatar">S</div><div><strong>Signal Coffee</strong><small>@signal_coffee</small></div><span>⌄</span></div></nav>
     </aside>
     <section className="content">
       <header className="topbar"><div><p className="eyebrow">2026年8月29日 土曜日</p><h1>おはようございます</h1></div><Link className="primary" href="/scheduled/new"><span>＋</span>新しい投稿</Link></header>
