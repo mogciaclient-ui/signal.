@@ -53,6 +53,24 @@ export async function syncInstagram(
       );
     }
     await batch.commit();
+    const currentMediaIds = new Set(list.data.map((media) => media.id));
+    const storedPosts = await db
+      .collection("socialPosts")
+      .where("socialAccountId", "==", accountId)
+      .get();
+    const removedPosts = storedPosts.docs.filter(
+      (post) => !currentMediaIds.has(post.id),
+    );
+    for (const post of removedPosts) {
+      const insights = await db
+        .collection("socialInsights")
+        .where("socialPostId", "==", post.id)
+        .get();
+      const cleanup = db.batch();
+      cleanup.delete(post.ref);
+      for (const insight of insights.docs) cleanup.delete(insight.ref);
+      await cleanup.commit();
+    }
     await Promise.all(
       list.data.map((media) =>
         syncInsights(userId, accountId, media.id, "post", mediaMetrics, token),
