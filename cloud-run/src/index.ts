@@ -5,7 +5,7 @@ import express, {
 } from "express";
 import { FieldValue } from "firebase-admin/firestore";
 import { config } from "./config.js";
-import { auth, db } from "./firebase.js";
+import { auth, bucket, db } from "./firebase.js";
 import {
   authorizationUrl,
   consumeOAuthState,
@@ -16,7 +16,7 @@ import {
 import { publishImage } from "./instagram/publishing.js";
 import { syncInstagram } from "./instagram/sync.js";
 import { publishDuePosts } from "./scheduled.js";
-import { readToken, saveToken } from "./tokens.js";
+import { deleteToken, readToken, saveToken } from "./tokens.js";
 import { assertOwnedStoragePath, createInstagramMediaUrl } from "./media.js";
 const app = express();
 app.use((req, res, next) => {
@@ -177,6 +177,45 @@ app.post("/scheduled", requireUser, async (req: AuthedRequest, res, next) => {
       publishedAt: null,
     });
     res.status(201).json({ id: ref.id, status: "scheduled" });
+  } catch (e) {
+    next(e);
+  }
+});
+async function deleteOwnedDocuments(collectionName: string, userId: string) {
+  while (true) {
+    const snapshot = await db
+      .collection(collectionName)
+      .where("userId", "==", userId)
+      .limit(400)
+      .get();
+    if (snapshot.empty) return;
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+    if (snapshot.size < 400) return;
+  }
+}
+app.post("/account/delete", requireUser, async (req: AuthedRequest, res, next) => {
+  try {
+    const userId = req.userId!;
+    const accounts = await db
+      .collection("socialAccounts")
+      .where("userId", "==", userId)
+      .get();
+    const tokenReferences = new Set(
+      accounts.docs
+        .map((doc) => doc.data().tokenReference)
+        .filter((value): value is string => typeof value === "string"),
+    );
+    for (const reference of tokenReferences) await deleteToken(reference);
+    await Promise.all(
+      ["socialInsights", "socialPosts", "scheduledPosts", "oauthStates", "socialAccounts", "users"].map(
+        (name) => deleteOwnedDocuments(name, userId),
+      ),
+    );
+    await bucket.deleteFiles({ prefix: `instagram/${userId}/` });
+    await auth.deleteUser(userId);
+    res.json({ status: "deleted" });
   } catch (e) {
     next(e);
   }

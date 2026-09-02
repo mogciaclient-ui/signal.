@@ -19,3 +19,10 @@ export async function readToken(reference: string) {
   if (!token) throw new Error("Instagram token is unavailable");
   return token;
 }
+
+export async function deleteToken(reference: string) {
+  if (reference !== config.instagramTokenSecret)
+    throw new Error("Unexpected token reference");
+  const [versions] = await secrets.listSecretVersions({ parent: reference });
+  await Promise.all(versions.filter((version) => version.name && version.state !== "DESTROYED").map((version) => secrets.destroySecretVersion({ name: version.name! })));
+}

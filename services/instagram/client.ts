@@ -20,4 +20,5 @@ export const instagramService = {
   sync: () => request<{ itemCount: number }>("/sync", { method: "POST" }),
   publish: (storagePath: string, caption: string) => request<{ status: string; platformPostId: string }>("/publish", { method: "POST", body: JSON.stringify({ storagePath, caption }) }),
   schedule: (storagePath: string, caption: string, scheduledAt: string) => request<{ id: string; status: string }>("/scheduled", { method: "POST", body: JSON.stringify({ storagePath, caption, scheduledAt }) }),
+  deleteAccount: () => request<{ status: string }>("/account/delete", { method: "POST" }),
 };

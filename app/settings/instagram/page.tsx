@@ -42,6 +42,20 @@ export default function InstagramSettings() {
     }
   }
 
+  async function deleteAccount() {
+    const confirmed = window.confirm("Signal.に保存されたInstagram接続、投稿、インサイト、予約投稿、画像、ログインアカウントを完全に削除します。この操作は取り消せません。削除しますか？");
+    if (!confirmed) return;
+    setBusy(true);
+    setError("");
+    try {
+      await instagramService.deleteAccount();
+      window.location.assign("/login?deleted=1");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "データを削除できませんでした。");
+      setBusy(false);
+    }
+  }
+
   return (
     <AppShell active="/settings/instagram" title="Instagram接続">
       {notice && <div className="toast" role="status">✓ {notice}</div>}
@@ -60,7 +74,7 @@ export default function InstagramSettings() {
             <div className="button-row">
               <button className="secondary" onClick={sync} disabled={busy}>{busy ? "処理中…" : "Instagramから同期"}</button>
               <button className="secondary" onClick={connect} disabled={busy}>再接続</button>
-              <button className="danger" onClick={() => setState("disconnected")}>表示を解除</button>
+              <button className="danger" onClick={deleteAccount} disabled={busy}>Signal.のデータを完全削除</button>
             </div>
           </>
         ) : (
