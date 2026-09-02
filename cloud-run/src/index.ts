@@ -204,6 +204,18 @@ app.use(
   async (error: unknown, req: Request, res: Response, _next: NextFunction) => {
     void _next;
     const message = error instanceof Error ? error.message : "Unexpected error";
+    const safeMessage = message.replace(
+      /\bEAA[A-Za-z0-9._-]+\b/g,
+      "[REDACTED_TOKEN]",
+    );
+    console.error(
+      JSON.stringify({
+        event: "request_failed",
+        endpoint: req.path,
+        errorName: error instanceof Error ? error.name : "UNKNOWN",
+        message: safeMessage,
+      }),
+    );
     await db
       .collection("errorLogs")
       .add({
@@ -217,7 +229,7 @@ app.use(
       .catch(() => undefined);
     res.status(500).json({
       error: "Instagram処理に失敗しました。時間をおいて再度お試しください。",
-      detail: process.env.NODE_ENV === "production" ? undefined : message,
+      detail: process.env.NODE_ENV === "production" ? undefined : safeMessage,
     });
   },
 );

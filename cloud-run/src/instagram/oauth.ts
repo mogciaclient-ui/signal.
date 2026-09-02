@@ -46,11 +46,55 @@ export async function consumeOAuthState(state: string) {
   });
 }
 
-async function graphJson<T>(url: URL): Promise<T> {
+type MetaError = {
+  message?: string;
+  type?: string;
+  code?: number;
+  error_subcode?: number;
+  fbtrace_id?: string;
+};
+
+function redactMetaPayload(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(redactMetaPayload);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [
+      key,
+      /access_token|client_secret|token/i.test(key)
+        ? "[REDACTED]"
+        : redactMetaPayload(item),
+    ]),
+  );
+}
+
+async function graphJson<T>(url: URL, operation: string): Promise<T> {
   const response = await fetch(url);
-  const payload = (await response.json()) as T & {
-    error?: { message?: string };
-  };
+  const raw = await response.text();
+  let payload: T & { error?: MetaError };
+  try {
+    payload = JSON.parse(raw) as T & { error?: MetaError };
+  } catch {
+    console.error(
+      JSON.stringify({
+        event: "meta_api_response",
+        operation,
+        status: response.status,
+        ok: false,
+        response: "[NON_JSON_RESPONSE]",
+      }),
+    );
+    throw new Error(`Meta ${operation} returned a non-JSON response`);
+  }
+
+  console.log(
+    JSON.stringify({
+      event: "meta_api_response",
+      operation,
+      status: response.status,
+      ok: response.ok && !payload.error,
+      response: redactMetaPayload(payload),
+    }),
+  );
   if (!response.ok || payload.error) {
     throw new Error(payload.error?.message || "Facebook OAuth request failed");
   }
@@ -70,7 +114,7 @@ export async function exchangeCode(code: string) {
   const short = await graphJson<{
     access_token: string;
     expires_in?: number;
-  }>(tokenUrl);
+  }>(tokenUrl, "oauth_code_exchange");
 
   const longUrl = new URL(
     `https://graph.facebook.com/${config.apiVersion}/oauth/access_token`,
@@ -84,7 +128,7 @@ export async function exchangeCode(code: string) {
   const long = await graphJson<{
     access_token: string;
     expires_in?: number;
-  }>(longUrl);
+  }>(longUrl, "long_lived_token_exchange");
   return {
     accessToken: long.access_token,
     expiresIn: long.expires_in || short.expires_in || 0,
@@ -104,12 +148,24 @@ export async function fetchAccount(userToken: string): Promise<{
     "id,name,access_token,tasks,instagram_business_account",
   );
   pagesUrl.searchParams.set("access_token", userToken);
-  const pages = await graphJson<ApiList<FacebookPage>>(pagesUrl);
+  const pages = await graphJson<ApiList<FacebookPage>>(
+    pagesUrl,
+    "managed_pages_lookup",
+  );
   const page = pages.data.find(
     (candidate) =>
       candidate.instagram_business_account?.id && candidate.access_token,
   );
   if (!page?.instagram_business_account?.id) {
+    console.error(
+      JSON.stringify({
+        event: "instagram_account_selection_failed",
+        pageCount: pages.data.length,
+        pagesWithInstagram: pages.data.filter(
+          (candidate) => candidate.instagram_business_account?.id,
+        ).length,
+      }),
+    );
     throw new Error(
       "Facebookページに接続されたInstagramプロアカウントが見つかりません",
     );
@@ -120,7 +176,10 @@ export async function fetchAccount(userToken: string): Promise<{
   );
   accountUrl.searchParams.set("fields", "id,username,account_type,media_count");
   accountUrl.searchParams.set("access_token", page.access_token);
-  const account = await graphJson<InstagramAccount>(accountUrl);
+  const account = await graphJson<InstagramAccount>(
+    accountUrl,
+    "instagram_account_lookup",
+  );
   return {
     account,
     pageId: page.id,
