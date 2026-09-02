@@ -174,7 +174,7 @@ export async function fetchAccount(userToken: string): Promise<{
   const accountUrl = new URL(
     `https://graph.facebook.com/${config.apiVersion}/${page.instagram_business_account.id}`,
   );
-  accountUrl.searchParams.set("fields", "id,username,account_type,media_count");
+  accountUrl.searchParams.set("fields", "id,username,media_count");
   accountUrl.searchParams.set("access_token", page.access_token);
   const account = await graphJson<InstagramAccount>(
     accountUrl,
