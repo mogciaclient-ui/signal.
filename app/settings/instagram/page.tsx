@@ -4,12 +4,14 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppShell } from "../../components";
 import { instagramService } from "../../../services/instagram/client";
+import { useSignalData } from "../../../lib/firebase/data";
 
 type State = "connected" | "disconnected" | "expired";
 
 export default function InstagramSettings() {
   const searchParams = useSearchParams();
   const connected = searchParams.get("connected") === "1";
+  const { account } = useSignalData();
   const [state, setState] = useState<State>(connected ? "connected" : "disconnected");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState(connected ? "Instagramアカウントを接続しました。" : "");
@@ -47,11 +49,11 @@ export default function InstagramSettings() {
       <div className="settings-card">
         <div className="ig-mark large">◎</div>
         <h2>Instagram</h2>
-        {state === "connected" ? (
+        {(account || state === "connected") ? (
           <>
             <div className="account-box">
               <div className="avatar">I</div>
-              <div><strong>Instagram接続済み</strong><small>Business / Creator</small></div>
+              <div><strong>{account ? `@${account.username}` : "Instagram接続済み"}</strong><small>Business / Creator</small></div>
               <span className="status"><i />接続済み</span>
             </div>
             <dl><div><dt>利用権限</dt><dd>基本情報・Insights・投稿公開</dd></div></dl>

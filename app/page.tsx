@@ -1,33 +1,4 @@
-/* eslint-disable @next/next/no-html-link-for-pages */
-import Link from "next/link";
-import { AuthGuard } from "./auth-guard";
-const posts = [
-  { color: "peach", date: "8月25日", title: "夏季限定メニューのお知らせ", reach: "1,842", likes: "128" },
-  { color: "mint", date: "8月21日", title: "朝の一杯を、もっと心地よく。", reach: "1,506", likes: "96" },
-  { color: "blue", date: "8月18日", title: "店内の新しい席をご紹介", reach: "1,284", likes: "84" },
-];
-export default function Home() {
-  return <AuthGuard><main className="shell">
-    <aside className="sidebar">
-      <a href="/" className="brand">Signal<span>.</span></a>
-      <nav aria-label="メインナビゲーション">
-        <a href="/" className="nav-item active"><span>⌂</span>ホーム</a>
-        <a href="/posts" className="nav-item"><span>▦</span>投稿</a>
-        <a href="/analytics" className="nav-item"><span>⌁</span>分析</a>
-        <a href="/scheduled" className="nav-item"><span>◷</span>予約投稿</a>
-      </nav>
-      <nav className="bottom-nav"><a href="/settings/instagram" className="nav-item"><span>⚙</span>設定</a><div className="profile"><div className="avatar">S</div><div><strong>Signal Coffee</strong><small>@signal_coffee</small></div><span>⌄</span></div></nav>
-    </aside>
-    <section className="content">
-      <header className="topbar"><div><p className="eyebrow">2026年8月29日 土曜日</p><h1>おはようございます</h1></div><Link className="primary" href="/scheduled/new"><span>＋</span>新しい投稿</Link></header>
-      <div className="connection card"><div className="ig-mark">◎</div><div><strong>Instagram</strong><p>@signal_coffee</p></div><span className="status"><i />接続済み</span><div className="sync"><small>最終同期</small><strong>今日 09:42</strong></div><button className="icon-button" aria-label="Instagramから同期">↻</button></div>
-      <div className="metrics">
-        <article className="metric-card"><div className="metric-top"><span>今月の投稿</span><i className="lavender">▦</i></div><strong>24</strong><small><b>↑ 12%</b> 前月比</small></article>
-        <article className="metric-card"><div className="metric-top"><span>合計リーチ</span><i className="sun">⌁</i></div><strong>32,480</strong><small><b>↑ 8.4%</b> 前月比</small></article>
-        <article className="metric-card"><div className="metric-top"><span>予約投稿</span><i className="sky">◷</i></div><strong>2</strong><small className="muted">次回 8/30 18:00</small></article>
-      </div>
-      <div className="section-heading"><div><h2>最近の投稿</h2><p>パフォーマンスをひと目で確認</p></div><Link href="/posts">すべて見る <span>→</span></Link></div>
-      <div className="recent-posts">{posts.map((post) => <article className="post-card" key={post.title}><div className={`post-image ${post.color}`}><span>Signal.</span></div><div className="post-body"><small>{post.date}</small><strong>{post.title}</strong><div><span>リーチ <b>{post.reach}</b></span><span>いいね <b>{post.likes}</b></span></div></div></article>)}</div>
-    </section>
-  </main></AuthGuard>;
-}
+"use client";
+import Link from "next/link";import {useState} from "react";import {AppShell} from "./components";import {dateOf,useSignalData} from "../lib/firebase/data";import {instagramService} from "../services/instagram/client";
+const fmt=(n:number)=>n.toLocaleString("ja-JP");const short=(s?:string)=>s?.trim().split("\n")[0]||"キャプションなし";
+export default function Home(){const{account,posts,scheduled,postInsights,accountInsights,loading,error}=useSignalData();const[busy,setBusy]=useState(false);async function sync(){setBusy(true);try{await instagramService.sync()}finally{setBusy(false)}}const upcoming=scheduled.filter(x=>x.status==="scheduled");return <AppShell active="/" title="ホーム" action={<Link className="primary" href="/scheduled/new"><span>＋</span>新しい投稿</Link>}>{error&&<div className="form-error">{error}</div>}<div className="connection card"><div className="ig-mark">◎</div><div><strong>Instagram</strong><p>{account?`@${account.username}`:"未接続"}</p></div><span className="status"><i />{account?.connectionStatus==="connected"?"接続済み":"未接続"}</span><div className="sync"><small>最終同期</small><strong>{dateOf(account?.lastSyncedAt)?.toLocaleString("ja-JP")||"未同期"}</strong></div><button className="icon-button" onClick={sync} disabled={busy} aria-label="Instagramから同期">{busy?"…":"↻"}</button></div><div className="metrics"><article className="metric-card"><div className="metric-top"><span>取得済み投稿</span><i className="lavender">▦</i></div><strong>{loading?"—":posts.length}</strong><small>Instagram実データ</small></article><article className="metric-card"><div className="metric-top"><span>合計リーチ</span><i className="sun">⌁</i></div><strong>{loading?"—":fmt(accountInsights.reach||0)}</strong><small>最新アカウントInsights</small></article><article className="metric-card"><div className="metric-top"><span>予約投稿</span><i className="sky">◷</i></div><strong>{loading?"—":upcoming.length}</strong><small className="muted">公開待ち</small></article></div><div className="section-heading"><div><h2>最近の投稿</h2><p>Instagramから同期した投稿</p></div><Link href="/posts">すべて見る <span>→</span></Link></div>{!loading&&posts.length===0?<div className="empty-state">投稿データがありません。</div>:<div className="recent-posts">{posts.slice(0,3).map(p=>{const m=postInsights[p.id]||{};return <Link href={`/posts/${p.id}`} className="post-card" key={p.id}>{p.thumbnailUrl||p.mediaUrl?<img className="post-image real-post-image" src={p.thumbnailUrl||p.mediaUrl} alt=""/>:<div className="post-image empty-thumb">◎</div>}<div className="post-body"><small>{p.publishedAt?new Date(p.publishedAt).toLocaleDateString("ja-JP"):"—"}</small><strong>{short(p.caption)}</strong><div><span>リーチ <b>{fmt(m.reach||0)}</b></span><span>いいね <b>{fmt(m.likes||0)}</b></span></div></div></Link>})}</div>}</AppShell>}
