@@ -28,7 +28,11 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json({ limit: "1mb" }));
-type AuthedRequest = Request & { userId?: string };
+type AuthedRequest = Request & {
+  userId?: string;
+  actorUserId?: string;
+  reviewer?: boolean;
+};
 async function requireUser(
   req: AuthedRequest,
   res: Response,
@@ -38,7 +42,11 @@ async function requireUser(
     const header = req.header("authorization");
     if (!header?.startsWith("Bearer "))
       return res.status(401).json({ error: "Authentication required" });
-    req.userId = (await auth.verifyIdToken(header.slice(7))).uid;
+    const decoded = await auth.verifyIdToken(header.slice(7));
+    const reviewOwnerId = decoded.reviewOwnerId;
+    req.actorUserId = decoded.uid;
+    req.reviewer = typeof reviewOwnerId === "string";
+    req.userId = typeof reviewOwnerId === "string" ? reviewOwnerId : decoded.uid;
     next();
   } catch {
     res.status(401).json({ error: "Authentication required" });
@@ -197,6 +205,9 @@ async function deleteOwnedDocuments(collectionName: string, userId: string) {
 }
 app.post("/account/delete", requireUser, async (req: AuthedRequest, res, next) => {
   try {
+    if (req.reviewer || req.actorUserId !== req.userId) {
+      return res.status(403).json({ error: "審査用アカウントでは所有者データを削除できません。" });
+    }
     const userId = req.userId!;
     const accounts = await db
       .collection("socialAccounts")

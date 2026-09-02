@@ -25,18 +25,27 @@ export function useSignalData() {
   const [scheduled,setScheduled]=useState<ScheduledPost[]>([]);
   const [loading,setLoading]=useState(true);
   const [error,setError]=useState("");
+  const [isReviewer,setIsReviewer]=useState(false);
   useEffect(()=>onAuthStateChanged(firebaseServices().auth,user=>{
-    if(!user){setLoading(false);return;}
+    let cancelled=false;
+    let unsubs:(()=>void)[]=[];
+    if(!user){setIsReviewer(false);setLoading(false);return;}
     const {db}=firebaseServices();
-    const unsubs=[
-      onSnapshot(query(collection(db,"socialAccounts"),where("userId","==",user.uid)),snap=>{setAccount(snap.docs[0]?row<SocialAccount>(snap.docs[0].id,snap.docs[0].data()):null);setLoading(false)},e=>{setError(e.message);setLoading(false)}),
-      onSnapshot(query(collection(db,"socialPosts"),where("userId","==",user.uid)),snap=>setPosts(snap.docs.map(d=>row<SocialPost>(d.id,d.data())).sort((a,b)=>String(b.publishedAt||"").localeCompare(String(a.publishedAt||"")))),e=>setError(e.message)),
-      onSnapshot(query(collection(db,"socialInsights"),where("userId","==",user.uid)),snap=>setInsights(snap.docs.map(d=>row<SocialInsight>(d.id,d.data()))),e=>setError(e.message)),
-      onSnapshot(query(collection(db,"scheduledPosts"),where("userId","==",user.uid)),snap=>setScheduled(snap.docs.map(d=>row<ScheduledPost>(d.id,d.data())).sort((a,b)=>(dateOf(a.scheduledAt)?.getTime()||0)-(dateOf(b.scheduledAt)?.getTime()||0))),e=>setError(e.message)),
-    ];
-    return ()=>unsubs.forEach(fn=>fn());
+    void user.getIdTokenResult().then(result=>{
+      if(cancelled)return;
+      const claim=result.claims.reviewOwnerId;
+      const ownerId=typeof claim==="string"?claim:user.uid;
+      setIsReviewer(ownerId!==user.uid);
+      unsubs=[
+        onSnapshot(query(collection(db,"socialAccounts"),where("userId","==",ownerId)),snap=>{setAccount(snap.docs[0]?row<SocialAccount>(snap.docs[0].id,snap.docs[0].data()):null);setLoading(false)},e=>{setError(e.message);setLoading(false)}),
+        onSnapshot(query(collection(db,"socialPosts"),where("userId","==",ownerId)),snap=>setPosts(snap.docs.map(d=>row<SocialPost>(d.id,d.data())).sort((a,b)=>String(b.publishedAt||"").localeCompare(String(a.publishedAt||"")))),e=>setError(e.message)),
+        onSnapshot(query(collection(db,"socialInsights"),where("userId","==",ownerId)),snap=>setInsights(snap.docs.map(d=>row<SocialInsight>(d.id,d.data()))),e=>setError(e.message)),
+        onSnapshot(query(collection(db,"scheduledPosts"),where("userId","==",ownerId)),snap=>setScheduled(snap.docs.map(d=>row<ScheduledPost>(d.id,d.data())).sort((a,b)=>(dateOf(a.scheduledAt)?.getTime()||0)-(dateOf(b.scheduledAt)?.getTime()||0))),e=>setError(e.message)),
+      ];
+    }).catch(e=>{if(!cancelled){setError(e instanceof Error?e.message:"認証情報を確認できませんでした。");setLoading(false)}});
+    return ()=>{cancelled=true;unsubs.forEach(fn=>fn())};
   }),[]);
   const postInsights=useMemo(()=>{const map:Record<string,Record<string,number>>={};for(const x of insights){if(x.scope!=="post"||!x.socialPostId)continue;(map[x.socialPostId]??={})[x.metric]=numeric(x.value)}return map},[insights]);
   const accountInsights=useMemo(()=>{const map:Record<string,number>={};for(const x of insights)if(x.scope==="account")map[x.metric]=numeric(x.value);return map},[insights]);
-  return {account,posts,insights,scheduled,postInsights,accountInsights,loading,error};
+  return {account,posts,insights,scheduled,postInsights,accountInsights,loading,error,isReviewer};
 }

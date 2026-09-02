@@ -11,7 +11,7 @@ type State = "connected" | "disconnected" | "expired";
 export default function InstagramSettings() {
   const searchParams = useSearchParams();
   const connected = searchParams.get("connected") === "1";
-  const { account } = useSignalData();
+  const { account, isReviewer } = useSignalData();
   const [state, setState] = useState<State>(connected ? "connected" : "disconnected");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState(connected ? "Instagramアカウントを接続しました。" : "");
@@ -74,8 +74,9 @@ export default function InstagramSettings() {
             <div className="button-row">
               <button className="secondary" onClick={sync} disabled={busy}>{busy ? "処理中…" : "Instagramから同期"}</button>
               <button className="secondary" onClick={connect} disabled={busy}>再接続</button>
-              <button className="danger" onClick={deleteAccount} disabled={busy}>Signal.のデータを完全削除</button>
+              {!isReviewer && <button className="danger" onClick={deleteAccount} disabled={busy}>Signal.のデータを完全削除</button>}
             </div>
+            {isReviewer && <small className="permission-note">審査用アカウントでは、所有者データの削除は無効です。</small>}
           </>
         ) : (
           <>
