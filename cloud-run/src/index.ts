@@ -46,7 +46,7 @@ async function requireUser(
     const reviewOwnerId = decoded.reviewOwnerId;
     req.actorUserId = decoded.uid;
     req.reviewer = typeof reviewOwnerId === "string";
-    req.userId = typeof reviewOwnerId === "string" ? reviewOwnerId : decoded.uid;
+    req.userId = decoded.uid;
     next();
   } catch {
     res.status(401).json({ error: "Authentication required" });
@@ -83,10 +83,11 @@ app.get("/oauth/callback", async (req, res, next) => {
     const { account, pageId, pageAccessToken } = await fetchAccount(
       token.accessToken,
     );
-    const tokenReference = await saveToken(account.id, pageAccessToken);
+    const socialAccountId = `${userId}--${account.id}`;
+    const tokenReference = await saveToken(socialAccountId, pageAccessToken);
     await db
       .collection("socialAccounts")
-      .doc(account.id)
+      .doc(socialAccountId)
       .set(
         {
           userId,

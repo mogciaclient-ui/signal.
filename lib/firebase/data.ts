@@ -34,8 +34,8 @@ export function useSignalData() {
     void user.getIdTokenResult().then(result=>{
       if(cancelled)return;
       const claim=result.claims.reviewOwnerId;
-      const ownerId=typeof claim==="string"?claim:user.uid;
-      setIsReviewer(ownerId!==user.uid);
+      const ownerId=user.uid;
+      setIsReviewer(typeof claim==="string");
       unsubs=[
         onSnapshot(query(collection(db,"socialAccounts"),where("userId","==",ownerId)),snap=>{setAccount(snap.docs[0]?row<SocialAccount>(snap.docs[0].id,snap.docs[0].data()):null);setLoading(false)},e=>{setError(e.message);setLoading(false)}),
         onSnapshot(query(collection(db,"socialPosts"),where("userId","==",ownerId)),snap=>setPosts(snap.docs.map(d=>row<SocialPost>(d.id,d.data())).sort((a,b)=>String(b.publishedAt||"").localeCompare(String(a.publishedAt||"")))),e=>setError(e.message)),

@@ -30,7 +30,10 @@ export async function syncInstagram(
     const batch = db.batch();
     for (const media of list.data) {
       itemCount++;
-      const ref = db.collection("socialPosts").doc(media.id);
+      const postId = accountId === platformAccountId
+        ? media.id
+        : `${accountId}--${media.id}`;
+      const ref = db.collection("socialPosts").doc(postId);
       batch.set(
         ref,
         {
@@ -59,7 +62,7 @@ export async function syncInstagram(
       .where("socialAccountId", "==", accountId)
       .get();
     const removedPosts = storedPosts.docs.filter(
-      (post) => !currentMediaIds.has(post.id),
+      (post) => !currentMediaIds.has(String(post.data().platformPostId || post.id)),
     );
     for (const post of removedPosts) {
       const insights = await db
@@ -136,16 +139,21 @@ async function syncInsights(
       const value = metric.total_value?.value ?? metric.values?.at(-1)?.value;
       if (value === undefined) continue;
       const snapshotDate = new Date().toISOString().slice(0, 10);
+      const ownerScopedObjectId = accountId.endsWith(`--${objectId}`)
+        ? accountId
+        : accountId === objectId
+          ? objectId
+          : `${accountId}--${objectId}`;
       const ref = db
         .collection("socialInsights")
-        .doc(`${scope}-${objectId}-${metric.name}-${snapshotDate}`);
+        .doc(`${scope}-${ownerScopedObjectId}-${metric.name}-${snapshotDate}`);
       batch.set(
         ref,
         {
           userId,
           platform: "instagram",
           socialAccountId: accountId,
-          socialPostId: scope === "post" ? objectId : null,
+          socialPostId: scope === "post" ? ownerScopedObjectId : null,
           scope,
           metric: metric.name,
           value,
