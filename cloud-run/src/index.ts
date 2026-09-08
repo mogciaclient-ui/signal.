@@ -120,7 +120,7 @@ app.post("/sync", requireUser, async (req: AuthedRequest, res, next) => {
         req.userId!,
         doc.id,
         account.platformAccountId,
-        await readToken(account.tokenReference),
+        await readToken(doc.id, account.tokenReference),
       ),
     );
   } catch (e) {
@@ -143,7 +143,7 @@ app.post("/publish", requireUser, async (req: AuthedRequest, res, next) => {
       account.platformAccountId,
       imageUrl,
       caption,
-      await readToken(account.tokenReference),
+      await readToken(doc.id, account.tokenReference),
     );
     res.json({ status: "published", platformPostId: result.id });
   } catch (e) {
@@ -231,12 +231,10 @@ app.post("/account/delete", requireUser, async (req: AuthedRequest, res, next) =
       .collection("socialAccounts")
       .where("userId", "==", userId)
       .get();
-    const tokenReferences = new Set(
-      accounts.docs
-        .map((doc) => doc.data().tokenReference)
-        .filter((value): value is string => typeof value === "string"),
-    );
-    for (const reference of tokenReferences) await deleteToken(reference);
+    for (const account of accounts.docs) {
+      const reference = account.data().tokenReference;
+      if (typeof reference === "string") await deleteToken(account.id, reference);
+    }
     await Promise.all(
       ["socialInsights", "socialPosts", "scheduledPosts", "oauthStates", "socialAccounts", "users"].map(
         (name) => deleteOwnedDocuments(name, userId),

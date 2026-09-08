@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppShell } from "../../components";
 import { instagramService } from "../../../services/instagram/client";
@@ -8,7 +8,7 @@ import { useSignalData } from "../../../lib/firebase/data";
 
 type State = "connected" | "disconnected" | "expired";
 
-export default function InstagramSettings() {
+function InstagramSettingsContent() {
   const searchParams = useSearchParams();
   const connected = searchParams.get("connected") === "1";
   const { account, isReviewer } = useSignalData();
@@ -101,5 +101,13 @@ export default function InstagramSettings() {
         )}
       </div>
     </AppShell>
+  );
+}
+
+export default function InstagramSettings() {
+  return (
+    <Suspense fallback={null}>
+      <InstagramSettingsContent />
+    </Suspense>
   );
 }

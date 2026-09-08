@@ -25,15 +25,14 @@ export async function publishDuePosts() {
       });
       if (!claimed) return;
       try {
-        const account = (
-          await db
-            .collection("socialAccounts")
-            .doc(claimed.socialAccountId)
-            .get()
-        ).data();
+        const accountDoc = await db
+          .collection("socialAccounts")
+          .doc(claimed.socialAccountId)
+          .get();
+        const account = accountDoc.data();
         if (!account?.tokenReference || !account?.platformAccountId)
           throw new Error("Instagram account is not connected");
-        const token = await readToken(account.tokenReference);
+        const token = await readToken(accountDoc.id, account.tokenReference);
         const imageUrl = await createInstagramMediaUrl(claimed.storagePath);
         const result = await publishImage(
           account.platformAccountId,

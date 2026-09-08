@@ -26,9 +26,6 @@ export const config = {
   get schedulerServiceAccountEmail() {
     return required("SCHEDULER_SERVICE_ACCOUNT_EMAIL");
   },
-  get instagramTokenSecret() {
-    return required("INSTAGRAM_TOKEN_SECRET");
-  },
   apiVersion: process.env.INSTAGRAM_API_VERSION || "v24.0",
   port: Number(process.env.PORT || 8080),
 };
