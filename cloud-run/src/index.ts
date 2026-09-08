@@ -5,7 +5,7 @@ import express, {
 } from "express";
 import { FieldValue } from "firebase-admin/firestore";
 import { config } from "./config.js";
-import { auth, bucket, db } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import {
   authorizationUrl,
   consumeOAuthState,
@@ -215,7 +215,6 @@ app.post("/account/disconnect", requireUser, async (req: AuthedRequest, res, nex
         (name) => deleteOwnedDocuments(name, userId),
       ),
     );
-    await bucket.deleteFiles({ prefix: `instagram/${userId}/` });
     res.json({ status: "disconnected" });
   } catch (e) {
     next(e);
@@ -240,7 +239,6 @@ app.post("/account/delete", requireUser, async (req: AuthedRequest, res, next) =
         (name) => deleteOwnedDocuments(name, userId),
       ),
     );
-    await bucket.deleteFiles({ prefix: `instagram/${userId}/` });
     await auth.deleteUser(userId);
     res.json({ status: "deleted" });
   } catch (e) {

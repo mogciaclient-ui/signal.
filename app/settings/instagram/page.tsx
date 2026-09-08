@@ -2,20 +2,26 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { deleteObject, listAll, ref } from "firebase/storage";
 import { AppShell } from "../../components";
 import { instagramService } from "../../../services/instagram/client";
 import { useSignalData } from "../../../lib/firebase/data";
-
-type State = "connected" | "disconnected" | "expired";
+import { firebaseServices } from "../../../lib/firebase/client";
 
 function InstagramSettingsContent() {
   const searchParams = useSearchParams();
   const connected = searchParams.get("connected") === "1";
-  const { account, isReviewer } = useSignalData();
-  const [state, setState] = useState<State>(connected ? "connected" : "disconnected");
+  const { account, isReviewer, loading } = useSignalData();
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState(connected ? "Instagramアカウントを接続しました。" : "");
   const [error, setError] = useState("");
+
+  async function deleteUploadedImages() {
+    const { auth, storage } = firebaseServices();
+    if (!auth.currentUser) throw new Error("Signal.へログインしてください。");
+    const uploaded = await listAll(ref(storage, `instagram/${auth.currentUser.uid}/`));
+    await Promise.all(uploaded.items.map((item) => deleteObject(item)));
+  }
 
   async function connect() {
     setBusy(true);
@@ -48,6 +54,7 @@ function InstagramSettingsContent() {
     setBusy(true);
     setError("");
     try {
+      await deleteUploadedImages();
       await instagramService.deleteAccount();
       window.location.assign("/login?deleted=1");
     } catch (caught) {
@@ -62,6 +69,7 @@ function InstagramSettingsContent() {
     setBusy(true);
     setError("");
     try {
+      await deleteUploadedImages();
       await instagramService.disconnectReviewer();
       window.location.assign("/settings/instagram?disconnected=1");
     } catch (caught) {
@@ -77,7 +85,9 @@ function InstagramSettingsContent() {
       <div className="settings-card">
         <div className="ig-mark large">◎</div>
         <h2>Instagram</h2>
-        {(account || state === "connected") ? (
+        {loading ? (
+          <p>Instagramの接続情報を読み込んでいます…</p>
+        ) : account ? (
           <>
             <div className="account-box">
               <div className="avatar">I</div>
