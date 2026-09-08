@@ -35,8 +35,8 @@ const permissions = [
   },
   {
     name: "instagram_content_publish",
-    purpose: "ユーザーが選んだ画像とキャプションを即時または予約で投稿する。",
-    text: "Signal. uses instagram_content_publish only when the authenticated user explicitly creates a post. The user selects a JPG or PNG image, enters a caption, and chooses immediate publishing or a future publish time. Signal. uploads the image, creates an Instagram media container, checks processing status, and publishes it to the user's connected Instagram professional account.",
+    purpose: "ユーザーが選んだ画像とキャプションをInstagramへ公開する。",
+    text: "Signal. uses instagram_content_publish only when the authenticated user explicitly chooses to publish a post. The user selects a JPG or PNG image, enters a caption, and starts publishing. Signal. uploads the image, creates an Instagram media container, checks its processing status, and publishes it to the user's connected Instagram professional account.",
     steps:
       "Open New Post, select a test image, enter “Meta App Review test post,” choose Publish now, and submit. Show the success screen and verify the new post on Instagram.",
   },
@@ -45,7 +45,7 @@ const checklist = [
   ["実装済み", "Facebook Loginと@mogcia接続"],
   ["実装済み", "実投稿一覧・投稿詳細"],
   ["実装済み", "投稿・アカウントInsights"],
-  ["実装済み", "画像の即時投稿・予約投稿"],
+  ["実装済み", "画像の公開機能"],
   ["実装済み", "Token管理・二重投稿防止"],
   ["実装済み", "Privacy・Terms・Data Deletion"],
   ["実装済み", "審査専用Signal.アカウントと削除保護"],
@@ -88,11 +88,6 @@ const script = [
   ],
   [
     "02:20–02:35",
-    "予約投稿",
-    "新しい投稿で日時指定を選び、未来の時刻で予約する。予約投稿一覧に「予約済み」と表示されることを映す。",
-  ],
-  [
-    "02:35–02:50",
     "データ管理",
     "Privacy PolicyとUser Data Deletionを開き、設定画面の「Signal.のデータを完全削除」ボタンまで見せる。実アカウントでは削除を確定しない。",
   ],
@@ -237,12 +232,12 @@ export default function Review() {
             and insights.
           </p>
           <p>
-            5. Open New Post to publish or schedule an image post. Use a JPG or
+            5. Open New Post to publish an image post. Use a JPG or
             PNG file smaller than 8 MB.
           </p>
           <CopyButton
             value={
-              "1. Open https://signal-instagram.mogcia-client.chatgpt.site/login.\n2. Sign in using the Signal. reviewer credentials provided in the App Review submission.\n3. Open Settings > Instagram and connect a Facebook account that manages a Page linked to an Instagram professional account.\n4. Use Posts and Analytics to review the connected account’s media and insights.\n5. Open New Post to publish or schedule an image post. Use a JPG or PNG file smaller than 8 MB."
+              "1. Open https://signal-instagram.mogcia-client.chatgpt.site/login.\n2. Sign in using the Signal. reviewer credentials provided in the App Review submission.\n3. Open Settings > Instagram and connect a Facebook account that manages a Page linked to an Instagram professional account.\n4. Use Posts and Analytics to review the connected account’s media and insights.\n5. Open New Post to publish an image post. Use a JPG or PNG file smaller than 8 MB."
             }
           />
         </div>
