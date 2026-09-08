@@ -217,7 +217,7 @@ export default function Review() {
         <div className="reviewer-notes">
           <p>
             1. Open{" "}
-            <b>https://signal-zeta-ochre.vercel.app/login</b>.
+            <b>https://signal-tool.com/login</b>.
           </p>
           <p>
             2. Sign in using the Signal. reviewer credentials provided in the
@@ -237,7 +237,7 @@ export default function Review() {
           </p>
           <CopyButton
             value={
-              "1. Open https://signal-zeta-ochre.vercel.app/login.\n2. Sign in using the Signal. reviewer credentials provided in the App Review submission.\n3. Open Settings > Instagram and connect a Facebook account that manages a Page linked to an Instagram professional account.\n4. Use Posts and Analytics to review the connected account’s media and insights.\n5. Open New Post to publish an image post. Use a JPG or PNG file smaller than 8 MB."
+              "1. Open https://signal-tool.com/login.\n2. Sign in using the Signal. reviewer credentials provided in the App Review submission.\n3. Open Settings > Instagram and connect a Facebook account that manages a Page linked to an Instagram professional account.\n4. Use Posts and Analytics to review the connected account’s media and insights.\n5. Open New Post to publish an image post. Use a JPG or PNG file smaller than 8 MB."
             }
           />
         </div>
