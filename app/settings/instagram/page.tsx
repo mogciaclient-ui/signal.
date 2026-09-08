@@ -56,6 +56,20 @@ export default function InstagramSettings() {
     }
   }
 
+  async function disconnectReviewer() {
+    const confirmed = window.confirm("審査用アカウントのInstagram接続、同期した投稿・インサイト、予約投稿、アップロード画像を削除して未接続状態に戻します。実行しますか？");
+    if (!confirmed) return;
+    setBusy(true);
+    setError("");
+    try {
+      await instagramService.disconnectReviewer();
+      window.location.assign("/settings/instagram?disconnected=1");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Instagram連携を解除できませんでした。");
+      setBusy(false);
+    }
+  }
+
   return (
     <AppShell active="/settings/instagram" title="Instagram接続">
       {notice && <div className="toast" role="status">✓ {notice}</div>}
@@ -74,9 +88,9 @@ export default function InstagramSettings() {
             <div className="button-row">
               <button className="secondary" onClick={sync} disabled={busy}>{busy ? "処理中…" : "Instagramから同期"}</button>
               <button className="secondary" onClick={connect} disabled={busy}>再接続</button>
-              {!isReviewer && <button className="danger" onClick={deleteAccount} disabled={busy}>Signal.のデータを完全削除</button>}
+              {isReviewer ? <button className="danger" onClick={disconnectReviewer} disabled={busy}>Instagram連携を解除</button> : <button className="danger" onClick={deleteAccount} disabled={busy}>Signal.のデータを完全削除</button>}
             </div>
-            {isReviewer && <small className="permission-note">審査用アカウントでは、所有者データの削除は無効です。</small>}
+            {isReviewer && <small className="permission-note">連携解除後も、審査用のSignal.ログインアカウントは残ります。</small>}
           </>
         ) : (
           <>

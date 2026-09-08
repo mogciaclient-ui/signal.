@@ -204,6 +204,23 @@ async function deleteOwnedDocuments(collectionName: string, userId: string) {
     if (snapshot.size < 400) return;
   }
 }
+app.post("/account/disconnect", requireUser, async (req: AuthedRequest, res, next) => {
+  try {
+    if (!req.reviewer) {
+      return res.status(403).json({ error: "審査用アカウント専用の操作です。" });
+    }
+    const userId = req.userId!;
+    await Promise.all(
+      ["socialInsights", "socialPosts", "scheduledPosts", "oauthStates", "socialAccounts"].map(
+        (name) => deleteOwnedDocuments(name, userId),
+      ),
+    );
+    await bucket.deleteFiles({ prefix: `instagram/${userId}/` });
+    res.json({ status: "disconnected" });
+  } catch (e) {
+    next(e);
+  }
+});
 app.post("/account/delete", requireUser, async (req: AuthedRequest, res, next) => {
   try {
     if (req.reviewer || req.actorUserId !== req.userId) {
