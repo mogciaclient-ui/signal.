@@ -42,7 +42,7 @@ export function useSignalData() {
         onSnapshot(query(collection(db,"socialInsights"),where("userId","==",ownerId)),snap=>setInsights(snap.docs.map(d=>row<SocialInsight>(d.id,d.data()))),e=>setError(e.message)),
         onSnapshot(query(collection(db,"scheduledPosts"),where("userId","==",ownerId)),snap=>setScheduled(snap.docs.map(d=>row<ScheduledPost>(d.id,d.data())).sort((a,b)=>(dateOf(a.scheduledAt)?.getTime()||0)-(dateOf(b.scheduledAt)?.getTime()||0))),e=>setError(e.message)),
       ];
-    }).catch(e=>{if(!cancelled){setError(e instanceof Error?e.message:"認証情報を確認できませんでした。");setLoading(false)}});
+    }).catch(e=>{if(!cancelled){setError(e instanceof Error?e.message:"Could not verify authentication.（認証情報を確認できませんでした）");setLoading(false)}});
     return ()=>{cancelled=true;unsubs.forEach(fn=>fn())};
   }),[]);
   const postInsights=useMemo(()=>{const map:Record<string,Record<string,number>>={};for(const x of insights){if(x.scope!=="post"||!x.socialPostId)continue;(map[x.socialPostId]??={})[x.metric]=numeric(x.value)}return map},[insights]);

@@ -4,6 +4,7 @@ import "./globals.css";
 import "./brand.css";
 import "./live-data.css";
 import "./review-ready.css";
+import "./review-guide.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Signal.｜Instagram運用を、ひとつの流れに",
-  description: "Instagram投稿の計画・公開・分析・改善を支える運用ダッシュボード。",
+  title: "Signal. | Instagram Management（Instagram運用）",
+  description: "Plan, publish, analyze, and improve Instagram content.（Instagram投稿の計画・公開・分析・改善）",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -30,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

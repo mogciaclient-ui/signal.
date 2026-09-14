@@ -3,15 +3,15 @@ import { firebaseServices } from "../../lib/firebase/client";
 const serviceUrl = process.env.NEXT_PUBLIC_INSTAGRAM_SERVICE_URL;
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  if (!serviceUrl) throw new Error("InstagramサービスURLが未登録です。");
+  if (!serviceUrl) throw new Error("Instagram service URL is not configured.（サービスURLが未登録です）");
   const user = firebaseServices().auth.currentUser;
-  if (!user) throw new Error("Signal.へログインしてください。");
+  if (!user) throw new Error("Sign in to Signal.（Signal.へログインしてください）");
   const headers = new Headers(init.headers);
   headers.set("Authorization", `Bearer ${await user.getIdToken()}`);
   if (init.body) headers.set("Content-Type", "application/json");
   const response = await fetch(`${serviceUrl}${path}`, { ...init, headers });
   const payload = await response.json() as T & { error?: string };
-  if (!response.ok) throw new Error(payload.error || "Instagram処理に失敗しました。");
+  if (!response.ok) throw new Error(payload.error || "Instagram request failed.（Instagram処理に失敗しました）");
   return payload;
 }
 

@@ -13,7 +13,7 @@ const firebaseConfig = {
 export const isFirebaseConfigured = Object.values(firebaseConfig).every(Boolean);
 
 export function firebaseServices() {
-  if (!isFirebaseConfigured) throw new Error("Firebase設定が未登録です。");
+  if (!isFirebaseConfigured) throw new Error("Firebase is not configured.（Firebase設定が未登録です）");
   const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
   return { auth: getAuth(app), storage: getStorage(app), db: getFirestore(app) };
 }
