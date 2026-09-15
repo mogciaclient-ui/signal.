@@ -5,85 +5,84 @@ import { AppShell } from "../components";
 const permissions = [
   {
     name: "pages_show_list",
-    purpose:
-      "Identify managed Facebook Pages and the linked Instagram professional account.（管理ページとリンク済みInstagramアカウントを特定）",
+    purpose: "管理しているFacebookページと、連携済みInstagramプロアカウントを特定するため",
     text: "Signal. uses pages_show_list after Facebook Login to retrieve the Facebook Pages managed by the authenticated user and identify the Page linked to the user's Instagram professional account. This is required so the user can connect the correct Instagram account to Signal. The data is used only for account connection and is not shared or sold.",
     steps:
       "Open Settings > Instagram, click “Connect Instagram with Facebook,” complete Facebook Login, and return to Signal. The connected @mogcia Instagram account is displayed.",
   },
   {
     name: "pages_read_engagement",
-    purpose:
-      "Access the basic information required to resolve the linked Instagram professional account.（リンク済みInstagramアカウントの基本情報へアクセス）",
+    purpose: "連携済みInstagramプロアカウントの特定に必要なページ基本情報を読むため",
     text: "Signal. uses pages_read_engagement together with pages_show_list and instagram_basic to read the basic Page information required by the Instagram API with Facebook Login and access the Instagram professional account linked to that Page. Signal. does not publish to or manage the Facebook Page.",
     steps:
       "Complete the Facebook connection in Settings > Instagram. Signal. resolves the linked Page and then displays the connected Instagram professional account.",
   },
   {
     name: "instagram_basic",
-    purpose: "Display Instagram account information, posts, and post details.（アカウント情報・投稿を表示）",
+    purpose: "Instagramのアカウント情報、投稿一覧、投稿詳細を表示するため",
     text: "Signal. uses instagram_basic to retrieve the connected Instagram professional account's ID and username and to display media owned by that account, including media type, caption, image or thumbnail, permalink, and publish time. Users use this data to review and manage their own Instagram content inside Signal.",
     steps:
       "After connecting @mogcia, open Posts. Show the real media grid, open one post, and show its caption, media, publish time, and Instagram permalink.",
   },
   {
     name: "instagram_manage_insights",
-    purpose: "Retrieve performance metrics for the user’s own account and posts.（自社アカウントと投稿の指標を取得）",
+    purpose: "自分のアカウントと投稿のパフォーマンス指標を取得するため",
     text: "Signal. uses instagram_manage_insights to retrieve insights for the authenticated user's own Instagram professional account and media. Signal. displays account reach, views, engaged accounts, total interactions, and available media metrics such as reach, views, likes, comments, saves, and shares so the user can evaluate content performance.",
     steps:
       "Open Analytics and show the account metrics. Then open a post from Posts and show its media-level reach, views, likes, comments, saves, and shares.",
   },
   {
     name: "instagram_content_publish",
-    purpose: "Publish an image and caption explicitly selected by the user.（選択した画像とキャプションを公開）",
+    purpose: "ユーザーが選んだ画像とキャプションをInstagramへ投稿するため",
     text: "Signal. uses instagram_content_publish only when the authenticated user explicitly chooses to publish a post. The user selects a JPG or PNG image, enters a caption, and starts publishing. Signal. uploads the image, creates an Instagram media container, checks its processing status, and publishes it to the user's connected Instagram professional account.",
     steps:
       "Open New Post, select a test image, enter “Meta App Review test post,” choose Publish now, and submit. Show the success screen and verify the new post on Instagram.",
   },
 ];
 const checklist = [
-  ["Implemented（実装済み）", "Facebook Login and @mogcia connection（Facebook接続）"],
-  ["Implemented（実装済み）", "Live post list and post details（実投稿一覧・詳細）"],
-  ["Implemented（実装済み）", "Post and account Insights（投稿・アカウント分析）"],
-  ["Implemented（実装済み）", "Image publishing（画像投稿）"],
-  ["Implemented（実装済み）", "Token management and duplicate prevention（トークン管理・二重投稿防止）"],
-  ["Implemented（実装済み）", "Privacy, Terms, and Data Deletion（各公開ページ）"],
-  ["Implemented（実装済み）", "Protected Signal. reviewer account（審査専用アカウント）"],
-  ["Verify in Meta（Metaで確認）", "Add all five permissions to Advanced Access review（5権限を申請）"],
-  ["Verify in Meta（Metaで確認）", "App domain, public URLs, and contact email（公開設定）"],
-  ["Verify in Meta（Metaで確認）", "Business verification status（ビジネス認証）"],
-  ["Before submission（提出前）", "Add Signal. reviewer credentials to the submission（審査用ログイン情報）"],
-  ["Before submission（提出前）", "Record the flow below and attach it to each permission（動画添付）"],
+  ["実装済み", "Facebookログインと @mogcia の接続"],
+  ["実装済み", "実際の投稿一覧と投稿詳細"],
+  ["実装済み", "投稿・アカウントのインサイト分析"],
+  ["実装済み", "画像投稿"],
+  ["実装済み", "トークン管理と二重投稿防止"],
+  ["実装済み", "プライバシー・利用規約・データ削除ページ"],
+  ["実装済み", "保護されたSignal.審査用アカウント"],
+  ["Metaで確認", "5つの権限をAdvanced Accessの審査対象に追加"],
+  ["Metaで確認", "アプリドメイン、公開URL、連絡先メール"],
+  ["Metaで確認", "ビジネス認証の状態"],
+  ["提出前", "Signal.審査用ログイン情報を申請に記載"],
+  ["提出前", "下記の操作動画を撮り、各権限へ添付"],
 ];
 const accountGuide = [
   {
-    title: "Signal. reviewer account（Signal.審査用アカウント）",
-    body: "Use the email address and password entered in the Meta App Review submission. This account is used only to sign in to Signal.（Metaの申請欄に記載するSignal.用メールアドレスとパスワード）",
+    title: "Signal.審査用アカウント",
+    body: "Metaの審査申請に記載するメールアドレスとパスワードです。Signal.へログインするためだけに使います。",
   },
   {
-    title: "Facebook account for recording（撮影用Facebookアカウント）",
-    body: "Use a real Facebook account added to the Meta app as an Administrator, Developer, or Tester. It must manage the Facebook Page linked to the @mogcia Instagram professional account. Make sure any role invitation has been accepted.（Metaアプリロール登録済みで、@mogciaとリンクしたFacebookページを管理できる実アカウント）",
+    title: "撮影用Facebookアカウント",
+    body: "Metaアプリに管理者・開発者・テスターのいずれかとして登録済みで、@mogciaとリンクしたFacebookページを管理できる実アカウントを使います。ロール招待は承認済みにしてください。",
   },
   {
-    title: "Do not use an unrelated general account（ロール外の一般アカウントは使わない）",
-    body: "Before Advanced Access is approved, an account with no app role may be unable to grant or use the requested permissions. A Meta-generated Test User may also be unsuitable when a real Page and Instagram professional account are required.（承認前は未登録アカウントで5権限が動かない可能性があります）",
+    title: "アプリロール外の一般アカウントは使わない",
+    body: "Advanced Accessの承認前は、アプリロールがないアカウントでは申請中の権限を許可・使用できないことがあります。実ページとInstagramプロアカウントが必要なので、Metaのテストユーザーも適しません。",
   },
 ];
 const resetSteps = [
-  "In Signal., open Settings > Instagram and select Disconnect Instagram. This keeps the Signal. reviewer login but removes its saved Instagram connection and synced review data.（Signal.で連携解除。審査用ログインは残ります）",
-  "In Facebook, sign in with the same recording account. Open Settings & privacy > Settings > Apps and websites. If Signal. appears under Business integrations instead, open it there.（撮影用Facebookアカウントの設定を開く）",
-  "Select Signal. and remove only its connection/access. Do not delete the Meta Developer app, App Review permissions, Facebook Page, or Instagram account.（Signal.への許可だけを削除）",
-  "Log out of Facebook, then open a private/incognito browser window.（Facebookからログアウトし、シークレットウィンドウを開く）",
-  "Open Signal., sign in with the Signal. reviewer account, and go to Settings > Instagram.（Signal.審査用アカウントでログイン）",
-  "Start recording before selecting Connect Instagram with Facebook. Show the browser URL, complete Facebook Login without cuts, approve the requested access, and return to Signal.（接続ボタンを押す前から録画し、認可画面を省略しない）",
-  "Confirm that @mogcia and Connected are visible. Then continue to Posts, Analytics, and New Post without changing accounts.（接続完了後、そのまま機能実演へ進む）",
+  "Signal.の「設定 → Instagram」で「Instagram連携を解除」を押します。Signal.の審査用ログインは残り、Instagram接続と同期した審査データだけが消えます。",
+  "撮影用FacebookアカウントでFacebookを開き、「設定とプライバシー → 設定 → アプリとウェブサイト」へ進みます。Signal.が「ビジネス統合」にある場合は、そちらを開きます。",
+  "一覧からSignal.を選び、Signal.に与えた接続・アクセス許可だけを削除します。Meta for Developers側のアプリ、審査申請中の権限、Facebookページ、Instagramアカウントは削除しません。",
+  "Facebookからログアウトし、ブラウザのシークレットウィンドウを開きます。",
+  "Signal.を開き、Signal.審査用アカウントでログインして「設定 → Instagram」へ進みます。",
+  "「FacebookでInstagramを接続」を押す前から録画を開始します。URLを映し、Facebookログインと許可画面を省略せず、Signal.へ戻るところまで収録します。",
+  "@mogcia と「接続済み」が表示されたことを確認し、同じアカウントのまま投稿、分析、新規投稿の実演へ進みます。",
 ];
 const cautions = [
-  "Do not remove the recording Facebook account from the Meta app roles before filming.（撮影前にアプリロールから外さない）",
-  "Do not delete the Signal. app in Meta for Developers or remove the five App Review requests.（Meta Developerのアプリや申請権限を削除しない）",
-  "Do not expose passwords, access tokens, App Secret, or one-time codes in the video.（パスワード・トークン・App Secret・認証コードを映さない）",
-  "The Facebook consent screen may use human-readable descriptions instead of showing all five technical permission names. Keep recording the complete flow.（技術的な権限名がすべて出なくてもフロー全体を収録する）",
-  "Use the same app version, UI, and reviewer credentials that Meta will test after submission.（動画と審査時のUI・認証情報を一致させる）",
+  "撮影用FacebookアカウントをMetaアプリのロールから外さない。",
+  "Meta for DevelopersにあるSignal.アプリや、申請中の5権限を削除しない。",
+  "FacebookページやInstagramアカウント自体を削除・リンク解除しない。",
+  "動画にパスワード、アクセストークン、App Secret、認証コードを映さない。",
+  "許可画面に5つの技術的な権限名が全部出なくても、認可フロー全体を撮影する。",
+  "提出動画と審査時で、アプリのバージョン、画面、審査用ログイン情報を同じにする。",
 ];
 const script = [
   [
@@ -133,24 +132,24 @@ function CopyButton({ value }: { value: string }) {
         setTimeout(() => setCopied(false), 1500);
       }}
     >
-      {copied ? "Copied（コピー済み）" : "Copy Text（文面をコピー）"}
+      {copied ? "コピーしました" : "Meta用の英語をコピー"}
     </button>
   );
 }
 export default function Review() {
   return (
-    <AppShell active="/review" title="Meta Review Guide（審査準備）">
+    <AppShell active="/review" title="Meta審査の準備ガイド">
       <section className="submission-hero">
         <div>
-          <span>PHASE 1-A · FACEBOOK LOGIN</span>
-          <h2>Submission Package（提出用パッケージ）</h2>
+          <span>フェーズ1-A · FACEBOOKログイン</span>
+          <h2>審査提出パッケージ</h2>
           <p>
-            Five permissions are included. Comments, DMs, ads, and business_management are not requested.（申請対象は5権限のみ）
+            申請するのは下記の5権限だけです。コメント、DM、広告、business_management は申請しません。
           </p>
         </div>
         <div className="submission-score">
           <strong>7</strong>
-          <small>Implemented Items（実装完了）</small>
+          <small>実装済み項目</small>
         </div>
       </section>
       <section className="review-section">
@@ -158,15 +157,15 @@ export default function Review() {
           <div>
             <span>01</span>
             <div>
-              <h2>Pre-submission Checklist（提出前チェック）</h2>
-              <p>Complete Meta verification and recording items before submission.（Meta確認と撮影を完了してください）</p>
+              <h2>提出前チェック</h2>
+              <p>提出前に、Meta側の設定確認と操作動画の撮影を済ませます。</p>
             </div>
           </div>
         </div>
         <div className="submission-checklist">
           {checklist.map(([status, item]) => (
             <div key={item}>
-              <span className={status.startsWith("Implemented") ? "done" : "todo"}>
+              <span className={status === "実装済み" ? "done" : "todo"}>
                 {status}
               </span>
               <p>{item}</p>
@@ -179,8 +178,8 @@ export default function Review() {
           <div>
             <span>02</span>
             <div>
-              <h2>Accounts to Use（使用するアカウント）</h2>
-              <p>Keep the Signal. login and Facebook authorization account clearly separated.（2種類のアカウントを区別してください）</p>
+              <h2>使用するアカウント</h2>
+              <p>Signal.へのログイン用と、Facebook認可用の2種類を区別します。</p>
             </div>
           </div>
         </div>
@@ -196,8 +195,8 @@ export default function Review() {
           ))}
         </div>
         <div className="review-callout">
-          <strong>Recommended recording account（推奨する撮影アカウント）</strong>
-          <p>Use the current real Facebook account that manages the linked Page and @mogcia, and keep it registered in the Meta app role. Reset only the existing Signal. authorization before recording.（今の実Facebookアカウントをロールに残し、Signal.への既存許可だけをリセットします）</p>
+          <strong>撮影に使うアカウント</strong>
+          <p>@mogcia とリンクしたFacebookページを管理している、現在の実Facebookアカウントを使います。このアカウントはMetaアプリのロールに残したままにします。撮影前にリセットするのは「Signal.への既存の接続許可」だけです。</p>
         </div>
       </section>
       <section className="review-section">
@@ -205,8 +204,8 @@ export default function Review() {
           <div>
             <span>03</span>
             <div>
-              <h2>Reset and Reconnect（初回状態への戻し方）</h2>
-              <p>Follow these steps in order before the final recording.（本番撮影前に上から順番に実行）</p>
+              <h2>撮影前に接続をリセットする手順</h2>
+              <p>本番撮影の直前に、上から順番に実行してください。</p>
             </div>
           </div>
         </div>
@@ -219,7 +218,7 @@ export default function Review() {
           ))}
         </ol>
         <div className="caution-box">
-          <h3>Do Not Do These（やってはいけないこと）</h3>
+          <h3>削除・解除してはいけないもの</h3>
           <ul>
             {cautions.map((caution) => <li key={caution}>{caution}</li>)}
           </ul>
@@ -230,8 +229,8 @@ export default function Review() {
           <div>
             <span>04</span>
             <div>
-              <h2>Permission Explanations（権限ごとの申請文）</h2>
-              <p>Paste the English text into each permission’s use-case and reviewer-steps fields.（各申請欄へ貼り付け）</p>
+              <h2>権限ごとの申請文</h2>
+              <p>各カードの英語文を、Metaの該当権限にある「利用目的」と「審査手順」の欄へ貼り付けます。</p>
             </div>
           </div>
         </div>
@@ -247,9 +246,9 @@ export default function Review() {
                   value={`${p.text}\n\nReviewer steps:\n${p.steps}`}
                 />
               </div>
-              <h3>How Signal. uses this permission</h3>
+              <h3>Metaへ貼る英語：この権限の利用目的</h3>
               <p>{p.text}</p>
-              <h3>Reviewer steps</h3>
+              <h3>Metaへ貼る英語：審査員の操作手順</h3>
               <p>{p.steps}</p>
             </article>
           ))}
@@ -260,9 +259,9 @@ export default function Review() {
           <div>
             <span>05</span>
             <div>
-              <h2>Review Screencast Script（審査動画台本）</h2>
+              <h2>審査動画の撮影台本</h2>
               <p>
-                About three minutes, preferably uncut. Always show the browser URL and Facebook authorization screen.（約3分・ノーカット推奨）
+                約3分、できればノーカットで撮影します。ブラウザのURLとFacebookの認可画面は必ず映してください。
               </p>
             </div>
           </div>
@@ -290,8 +289,8 @@ export default function Review() {
           <div>
             <span>06</span>
             <div>
-              <h2>Reviewer Instructions（審査員向け共通手順）</h2>
-              <p>Add this text to the Submission Notes.（Submission Notesへ記載）</p>
+              <h2>審査員向け共通手順</h2>
+              <p>下の英語をMetaの「Submission Notes（提出メモ）」へ貼り付けます。</p>
             </div>
           </div>
         </div>
@@ -330,7 +329,7 @@ export default function Review() {
             Data Deletion
           </Link>
           <Link className="primary" href="/settings/instagram">
-            Start Recording（撮影を開始）
+            撮影を開始する
           </Link>
         </div>
       </section>
