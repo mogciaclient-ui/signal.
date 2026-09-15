@@ -135,6 +135,48 @@ export async function exchangeCode(code: string) {
   };
 }
 
+type PermissionStatus = {
+  permission: string;
+  status: string;
+};
+
+export async function logGrantedPermissions(userToken: string) {
+  const permissionsUrl = new URL(
+    `https://graph.facebook.com/${config.apiVersion}/me/permissions`,
+  );
+  permissionsUrl.searchParams.set("access_token", userToken);
+  try {
+    const result = await graphJson<ApiList<PermissionStatus>>(
+      permissionsUrl,
+      "granted_permissions_lookup",
+    );
+    const statusByPermission = new Map(
+      result.data.map((item) => [item.permission, item.status]),
+    );
+    console.log(
+      JSON.stringify({
+        event: "oauth_permission_summary",
+        requested: permissions,
+        granted: permissions.filter(
+          (permission) => statusByPermission.get(permission) === "granted",
+        ),
+        missingOrDeclined: permissions.filter(
+          (permission) => statusByPermission.get(permission) !== "granted",
+        ),
+      }),
+    );
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        event: "oauth_permission_diagnostics_failed",
+        errorName: error instanceof Error ? error.name : "UNKNOWN",
+        message:
+          error instanceof Error ? error.message : "Unexpected diagnostics error",
+      }),
+    );
+  }
+}
+
 export async function fetchAccount(userToken: string): Promise<{
   account: InstagramAccount;
   pageId: string;

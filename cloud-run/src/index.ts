@@ -12,6 +12,7 @@ import {
   createOAuthState,
   exchangeCode,
   fetchAccount,
+  logGrantedPermissions,
 } from "./instagram/oauth.js";
 import { publishImage } from "./instagram/publishing.js";
 import { syncInstagram } from "./instagram/sync.js";
@@ -80,6 +81,7 @@ app.get("/oauth/callback", async (req, res, next) => {
       return res.status(400).send("Invalid OAuth callback");
     const userId = await consumeOAuthState(req.query.state);
     const token = await exchangeCode(req.query.code);
+    await logGrantedPermissions(token.accessToken);
     const { account, pageId, pageAccessToken } = await fetchAccount(
       token.accessToken,
     );
